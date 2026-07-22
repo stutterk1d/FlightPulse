@@ -4,7 +4,6 @@ import pendulum
 from airflow.sdk import dag, get_current_context, task
 
 
-
 def _slack(text: str):
     # Use slack
     import requests
