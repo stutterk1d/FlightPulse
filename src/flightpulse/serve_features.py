@@ -47,6 +47,15 @@ def _dep_bucket(hour: int) -> str:
 
 
 def lookup_congestion(origin: str, fl_date: str, dep_hour: int) -> int:
+    sql_exact = (
+        "SELECT count(*) FROM flights "
+        "WHERE origin = %s AND fl_date = %s AND (crs_dep_time / 100) = %s"
+    )
+    sql_fallback = (
+        "SELECT COALESCE(percentile_disc(0.5) WITHIN GROUP (ORDER BY c), 1)::int "
+        "FROM (SELECT count(*) AS c FROM flights "
+        "WHERE origin = %s AND (crs_dep_time / 100) = %s GROUP BY fl_date) t"
+    )
     conn = _conn()
     try:
         with conn.cursor() as cur:
@@ -91,4 +100,5 @@ def build_serving_features(
     df["distance"] = df["distance"].astype("float32")
     df["crs_elapsed_time"] = df["crs_elapsed_time"].astype("float32")
     return df
+
 

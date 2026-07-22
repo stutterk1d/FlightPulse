@@ -60,7 +60,6 @@ def evidently_drift(ref: pd.DataFrame, cur: pd.DataFrame,
     d = snapshot.dict()
     share = count = None
     for m in d.get("metrics", []):
-        mid = str(m.get("metric_id", m.get("metric", "")))
         val = m.get("value", {})
         if isinstance(val, dict) and "share" in val and "count" in val:
             share, count = val["share"], val["count"]
@@ -136,8 +135,9 @@ if __name__ == "__main__":
 
     ref = build_features(load_window("2019-06-01", "2019-06-30"))
     print("PSI self-check (ref vs ref):")
-    print(psi_report(ref, ref))          
+    print(psi_report(ref, ref))
     print()
     validate_detector(ref)
+
 
 

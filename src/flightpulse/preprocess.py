@@ -9,11 +9,11 @@ MODELS_DIR = Path("models")
 MODELS_DIR.mkdir(exist_ok=True)
 PREPROCESSOR_PATH = MODELS_DIR / "preprocessor.joblib"
 
-HIGH_CARD = ["route", "origin", "dest"]                 
+HIGH_CARD = ["route", "origin", "dest"]
 LOW_CARD  = ["airline", "season", "dep_bucket",
-             "is_weekend", "is_holiday"]                 
+             "is_weekend", "is_holiday"]
 NUMERIC   = ["distance", "crs_elapsed_time",
-             "dep_minutes", "congestion"]                
+             "dep_minutes", "congestion"]
 
 def build_preprocessor() -> ColumnTransformer:
     return ColumnTransformer(
@@ -26,7 +26,7 @@ def build_preprocessor() -> ColumnTransformer:
     )
 
 def time_split(feats: pd.DataFrame, train_end: str = "2022-12-31"):
-    raise NotImplementedError  
+    raise NotImplementedError
 
 def fit_from_windows(
     train_start="2019-01-01", train_end="2022-12-31",
@@ -59,4 +59,5 @@ def fit_from_windows(
 
 if __name__ == "__main__":
     fit_from_windows()
+
 

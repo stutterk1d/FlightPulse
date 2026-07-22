@@ -24,6 +24,14 @@ def _conn():
 
 
 def sample_flights(n: int = 300) -> pd.DataFrame:
+    sql = (
+        "SELECT fl_date::text AS fl_date, airline_code AS airline, origin, dest, "
+        "crs_dep_time, crs_elapsed_time, distance FROM flights "
+        "WHERE fl_date BETWEEN '2023-01-01' AND '2023-08-31' "
+        "AND cancelled = 0 AND diverted = 0 "
+        "AND crs_elapsed_time IS NOT NULL AND distance IS NOT NULL "
+        "ORDER BY random() LIMIT %s"
+    )
     conn = _conn()
     try:
         return pd.read_sql(sql, conn, params=(n,))
@@ -68,3 +76,4 @@ if __name__ == "__main__":
     ap.add_argument("--delay", type=float, default=0.0,
                     help="seconds between requests (0 = as fast as possible)")
     main(*vars(ap.parse_args()).values())
+

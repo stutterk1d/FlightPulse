@@ -62,6 +62,10 @@ class FlightRequest(BaseModel):
 
 
 def _log_prediction(features_json: str, proba: float, prediction: int, version: str):
+    sql = (
+        "INSERT INTO prediction_log (model_version, features, proba, prediction) "
+        "VALUES (%s, %s, %s, %s)"
+    )
     try:
         conn = _conn()
         try:
@@ -144,3 +148,4 @@ def predict(req: FlightRequest, background: BackgroundTasks):
         "model_version": _model_version,
         "congestion": int(X["congestion"].iloc[0]),
     }
+

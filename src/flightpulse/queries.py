@@ -10,8 +10,8 @@ load_dotenv(Path(__file__).resolve().parents[2] / '.env')
 _SELECT_COLS = [
     "fl_date", "airline", "airline_code", "origin", "dest",
     "crs_dep_time", "crs_arr_time", "crs_elapsed_time", "distance",
-    "arr_delay",          
-    "cancelled", "diverted",  
+    "arr_delay",
+    "cancelled", "diverted",
 ]
 
 def get_conn():

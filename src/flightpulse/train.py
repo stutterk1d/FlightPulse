@@ -81,8 +81,10 @@ def train_and_register(
     print("Loading + building features ...")
     train_feats = build_features(load_window(train_start, train_end))
     test_feats = build_features(load_window(test_start, test_end))
-    Xtr = train_feats.drop(columns=["label"]); ytr = train_feats["label"].to_numpy()
-    Xte = test_feats.drop(columns=["label"]);  yte = test_feats["label"].to_numpy()
+    Xtr = train_feats.drop(columns=["label"])
+    ytr = train_feats["label"].to_numpy()
+    Xte = test_feats.drop(columns=["label"])
+    yte = test_feats["label"].to_numpy()
     print(f"  train {Xtr.shape}, test {Xte.shape}, "
           f"train pos {ytr.mean():.4f}, test pos {yte.mean():.4f}")
 
@@ -164,4 +166,5 @@ def train_and_register(
 
 if __name__ == "__main__":
     train_and_register()
+
 
