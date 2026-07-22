@@ -1,0 +1,18 @@
+FROM apache/airflow:3.3.0
+
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential libpq-dev \
+ && rm -rf /var/lib/apt/lists/*
+USER airflow
+
+RUN pip install --no-cache-dir \
+    "evidently==0.7.21" \
+    "deepchecks==0.19.1" \
+    "mlflow==3.12.0" \
+    "xgboost" \
+    "scikit-learn==1.7.2" \
+    "holidays" \
+    "psycopg2-binary" \
+    "python-dotenv" \
+    "apache-airflow-providers-slack"

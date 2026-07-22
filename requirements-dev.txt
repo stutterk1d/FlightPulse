@@ -1,0 +1,16 @@
+pandas>=2.2
+numpy>=1.26
+scipy>=1.13
+scikit-learn==1.7.*
+matplotlib
+jupyterlab
+psycopg2-binary
+sqlalchemy>=2.0
+python-dotenv
+kaggle
+ruff
+pytest
+holidays
+deepchecks==0.19.1
+xgboost
+mlflow==3.12.0
