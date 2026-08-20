@@ -12,7 +12,7 @@ from src.flightpulse.serve_features import build_serving_features
 
 load_dotenv(Path(__file__).resolve().parents[3] / ".env")
 
-MODEL_URI = "models:/flightpulse@champion"
+MODEL_URI = "models:/flightpulse@best_model"
 app = FastAPI(title="FlightPulse", version="1.0")
 
 _model = None
@@ -29,13 +29,13 @@ def _conn():
     )
 
 
-def _load_champion():
+def _load_best_model():
     global _model, _model_version
     mlflow.set_tracking_uri(os.environ.get("MLFLOW_TRACKING_URI", "http://localhost:5000"))
     _model = mlflow.pyfunc.load_model(MODEL_URI)
     try:
         from mlflow import MlflowClient
-        mv = MlflowClient().get_model_version_by_alias("flightpulse", "champion")
+        mv = MlflowClient().get_model_version_by_alias("flightpulse", "best_model")
         _model_version = mv.version
     except Exception:
         _model_version = "unknown"
@@ -45,10 +45,10 @@ def _load_champion():
 @app.on_event("startup")
 def startup():
     try:
-        v = _load_champion()
-        print(f"[startup] loaded champion v{v}")
+        v = _load_best_model()
+        print(f"[startup] loaded best model v{v}")
     except Exception as e:
-        print(f"[startup] could not load champion: {e}")
+        print(f"[startup] could not load best model: {e}")
 
 
 class FlightRequest(BaseModel):
@@ -91,7 +91,7 @@ def health():
 @app.post("/reload")
 def reload_model():
     try:
-        v = _load_champion()
+        v = _load_best_model()
         return {"status": "reloaded", "model_version": v}
     except Exception as e:
         raise HTTPException(status_code=503, detail=f"reload failed: {e}")

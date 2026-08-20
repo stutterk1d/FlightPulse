@@ -55,13 +55,13 @@ def load_predictions() -> pd.DataFrame:
 
 
 @st.cache_data(ttl=30)
-def champion_info() -> dict:
+def best_model_info() -> dict:
     try:
         import mlflow
         from mlflow import MlflowClient
         mlflow.set_tracking_uri(MLFLOW_URI)
         c = MlflowClient()
-        mv = c.get_model_version_by_alias("flightpulse", "champion")
+        mv = c.get_model_version_by_alias("flightpulse", "best_model")
         run = c.get_run(mv.run_id)
         return {
             "version": mv.version,
@@ -90,23 +90,23 @@ tab_overview, tab_drift, tab_preds, tab_try = st.tabs(
 )
 # Overview
 with tab_overview:
-    champ = champion_info()
+    best_model = best_model_info()
     health = api_health()
 
     c1, c2, c3, c4 = st.columns(4)
-    if "error" not in champ:
-        c1.metric("Champion", f"v{champ['version']}", champ["run_name"])
-        c2.metric("ROC-AUC", f"{champ['auc']:.4f}" if champ["auc"] else "—")
-        c3.metric("PR-AUC", f"{champ['pr_auc']:.4f}" if champ["pr_auc"] else "—")
+    if "error" not in best_model:
+        c1.metric("Best Model", f"v{best_model['version']}", best_model["run_name"])
+        c2.metric("ROC-AUC", f"{best_model['auc']:.4f}" if best_model["auc"] else "—")
+        c3.metric("PR-AUC", f"{best_model['pr_auc']:.4f}" if best_model["pr_auc"] else "—")
     else:
-        c1.metric("Champion", "unavailable")
-        st.warning(f"MLflow: {champ['error']}")
+        c1.metric("Best Model", "unavailable")
+        st.warning(f"MLflow: {best_model['error']}")
     c4.metric("API", health.get("status", "?"),
               f"model v{health.get('model_version', '?')}")
 
-    if "error" not in champ:
-        st.caption(f"Features: `{champ['features']}` · Leakage check: "
-                   f"`{champ['leakage_check']}`")
+    if "error" not in best_model:
+        st.caption(f"Features: `{best_model['features']}` · Leakage check: "
+                   f"`{best_model['leakage_check']}`")
 
     st.subheader("Pipeline decisions")
     jobs = load_jobs()
@@ -127,7 +127,7 @@ with tab_overview:
 
         hist = jobs.dropna(subset=["pr_auc"]).sort_values("created_at")
         if len(hist) > 1:
-            st.subheader("Champion PR-AUC over retrains")
+            st.subheader("Best Model PR-AUC over retrains")
             st.line_chart(hist.set_index("created_at")[["auc", "pr_auc"]])
 
 # Drift
@@ -175,7 +175,7 @@ with tab_preds:
 # Try it
 with tab_try:
     st.subheader("Live prediction")
-    st.caption(f"POSTs to {API}/predict — the same champion the DAG promotes.")
+    st.caption(f"POSTs to {API}/predict — the same best model the DAG promotes.")
 
     c1, c2 = st.columns(2)
     with c1:

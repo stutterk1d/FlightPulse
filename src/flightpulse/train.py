@@ -30,7 +30,7 @@ EXPERIMENT = "flightpulse-training"
 # Promotion policy
 MIN_AUC = 0.60            # never promote a model worse than this
 MAX_DEGRADATION = 0.05    # train_pr - test_pr must be <= this
-PROMOTE_MARGIN = 0.005    # challenger must beat champion PR-AUC by at least this
+PROMOTE_MARGIN = 0.005    # challenger must beat best model PR-AUC by at least this
 
 
 def _fingerprint(df: pd.DataFrame) -> str:
@@ -141,23 +141,23 @@ def train_and_register(
     winner_pr = eligible[winner]["test"]["pr_auc"]
 
     try:
-        champ = client.get_model_version_by_alias(MODEL_NAME, "champion")
-        champ_pr = float(client.get_run(champ.run_id).data.metrics["pr_auc"])
+        best_model = client.get_model_version_by_alias(MODEL_NAME, "best_model")
+        best_model_pr = float(client.get_run(best_model.run_id).data.metrics["pr_auc"])
     except Exception:
-        champ_pr = -1.0
+        best_model_pr = -1.0
 
     print(f"\nWinner among eligible: {winner} (PR-AUC {winner_pr:.4f}). "
-          f"Incumbent champion PR-AUC: {champ_pr:.4f}")
+          f"Incumbent best model PR-AUC: {best_model_pr:.4f}")
 
-    if winner_pr > champ_pr + PROMOTE_MARGIN:
-        client.set_registered_model_alias(MODEL_NAME, "champion", eligible[winner]["version"])
-        print(f"PROMOTED {winner} v{eligible[winner]['version']} -> @champion")
+    if winner_pr > best_model_pr + PROMOTE_MARGIN:
+        client.set_registered_model_alias(MODEL_NAME, "best_model", eligible[winner]["version"])
+        print(f"PROMOTED {winner} v{eligible[winner]['version']} -> @best_model")
     else:
-        print("Winner did not beat incumbent by the margin — champion unchanged.")
+        print("Winner did not beat incumbent by the margin — best model unchanged.")
 
-    non_champ = [n for n in results if n != winner]
-    if non_champ:
-        chal = max(non_champ, key=lambda n: results[n]["test"]["pr_auc"])
+    other_models = [n for n in results if n != winner]
+    if other_models:
+        chal = max(other_models, key=lambda n: results[n]["test"]["pr_auc"])
         client.set_registered_model_alias(MODEL_NAME, "challenger", results[chal]["version"])
         print(f"Set {chal} v{results[chal]['version']} -> @challenger")
 

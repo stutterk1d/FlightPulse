@@ -79,7 +79,7 @@ def flightpulse_pipeline():
     def retrain(meta: dict) -> dict:
         from src.flightpulse.train import train_and_register
         results = train_and_register()  # full 2019-2022 train, 2023 test
-        # pull the champion's metrics for logging
+        # pull the best model's metrics for logging
         best = max(results.values(), key=lambda r: r["test"]["pr_auc"])
         meta.update({
             "auc": float(best["test"]["auc"]),
