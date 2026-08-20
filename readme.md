@@ -2,7 +2,7 @@
 
 ![CI](https://github.com/stutterk1d/FlightPulse/actions/workflows/ci.yml/badge.svg)
 
-** This is a flight delay prediciton pipeline that also detects when the data has drifted **
+**This is a flight delay prediciton pipeline that also detects when the data has drifted**
 
 An Airflow DAG compares each new window of flight data against a reference and branches. It does a halt on bad data, skips when nothing changed, and retrains and creates a new model when it detects drift. This is built with U.S. DOT on-time performance data, a 3M-row sample from 2019 to 2023.
 
@@ -49,7 +49,7 @@ flowchart TB
         GD -->|yes| R[retrain<br/>HistGB + XGBoost]
         R --> P[promote best model + Slack]
     end
-    P --> MLF[(MLflow<br/>@best model)]
+    P --> MLF[(MLflow registry<br/>best_model alias)]
     MLF --> API[FastAPI /predict]
     P --> JOBS[(jobs table)]
     JOBS --> DASH[Streamlit dashboard]
@@ -81,3 +81,4 @@ Trigger `flightpulse_pipeline` with reference `2019-04-01`/`2019-04-30` and wind
 ---
 
 Data: [Flight Delay and Cancellation Dataset 2019–2023](https://www.kaggle.com/datasets/patrickzel/flight-delay-and-cancellation-dataset-2019-2023) (Kaggle mirror of U.S. DOT BTS on-time performance). The prediction log is fed by a generator that samples real flights and sends them through the live API.
+
